@@ -1,52 +1,52 @@
 <template>
   <section class="section main-section">
-    <div class="card has-table" v-if="suppliers.length">
+    <div class="card has-table" v-if="employees.length">
       <header class="card-header">
-        <p class="card-header-title">Suppliers</p>
+        <p class="card-header-title">Employees</p>
       </header>
       <div class="card-content">
         <table>
           <thead>
             <tr>
               <th></th>
-              <th>Company</th>
-              <th>Contact</th>
+              <th>Name</th>
               <th>Title</th>
               <th>City</th>
+              <th>Phone</th>
               <th>Country</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="supplier in suppliers[page]" :key="supplier.id">
+            <tr v-for="employee in employees[page]" :key="employee.id">
               <td class="image-cell">
                 <div class="image">
                   <img
-                    :src="getAvatarUrl(supplier.contactName!)"
+                    :src="getAvatarUrl(employee.firstName, employee.lastName)"
                     class="rounded-full"
                   />
                 </div>
               </td>
               <td>
-                <a class="link" @click="openSupplier(supplier.id)">{{
-                  supplier.companyName
+                <a class="link" @click="openEmployee(employee.id)">{{
+                  employee.firstName + ' ' + employee.lastName
                 }}</a>
               </td>
-              <td>{{ supplier.contactName }}</td>
-              <td>{{ supplier.contactTitle }}</td>
-              <td>{{ supplier.city }}</td>
-              <td>{{ supplier.country }}</td>
+              <td>{{ employee.title }}</td>
+              <td>{{ employee.city }}</td>
+              <td>{{ employee.homePhone }}</td>
+              <td>{{ employee.country }}</td>
             </tr>
           </tbody>
         </table>
         <div class="table-pagination">
           <div class="pagination">
             <div class="buttons">
-              <div v-for="num in suppliers.length" :key="num">
+              <div v-for="num in employees.length" :key="num">
                 <button
                   type="button"
                   class="button"
                   v-if="
-                    (num <= page + 7 || num >= suppliers.length - 1) &&
+                    (num <= page + 7 || num >= employees.length - 1) &&
                     (num <= 2 || num >= page - 6)
                   "
                   :class="{ active: page === num - 1 }"
@@ -63,34 +63,31 @@
                 </button>
               </div>
             </div>
-            <small>Page {{ page + 1 }} of {{ suppliers.length }}</small>
+            <small>Page {{ page + 1 }} of {{ employees.length }}</small>
           </div>
         </div>
       </div>
     </div>
-    <div class="card-content" v-else><h2>Loading suppliers...</h2></div>
+    <div class="card-content" v-else><h2>Loading employees...</h2></div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useSuppliersStore } from '@/stores/suppliers';
-const suppliersStore = useSuppliersStore();
+import { useEmployeesStore } from '@/stores/employees';
+const employeesStore = useEmployeesStore();
 const router = useRouter();
-const suppliers = computed(() => suppliersStore.suppliersByPage);
+const employees = computed(() => employeesStore.employeesByPage);
+const getAvatarUrl = (firstName: string, lastName: string) => {
+  return `https://avatars.dicebear.com/v2/initials/${firstName}-${lastName}.svg`;
+};
 const page = ref(0);
-const getAvatarUrl = (name: string) => {
-  const initials = name.split(' ');
-  return `https://avatars.dicebear.com/v2/initials/${initials[0]}-${
-    initials[initials.length - 1]
-  }.svg`;
-};
-const openSupplier = (id: number) => {
-  router.push(`/suppliers/${id}`);
-};
 const selectPage = (num: number) => {
   page.value = num;
+};
+const openEmployee = (id: number) => {
+  router.push(`/employees/${id}`);
 };
 </script>
 
@@ -98,7 +95,15 @@ const selectPage = (num: number) => {
 .main-section {
   padding: 1.5rem;
 }
-
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
 .card {
   background-color: rgb(255, 255, 255);
   border-color: rgb(243, 244, 246);
@@ -112,19 +117,9 @@ const selectPage = (num: number) => {
   border-color: rgb(243, 244, 246);
   display: flex;
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-size: inherit;
-  font-weight: inherit;
-}
 .card-content {
   padding: 0;
 }
-
 .card-header-title {
   flex-grow: 1;
   font-weight: 700;
@@ -147,7 +142,6 @@ table {
   border-color: inherit;
   text-indent: 0;
 }
-
 thead {
   display: table-header-group;
 }
@@ -166,10 +160,6 @@ th {
 
 tr:nth-child(odd) td {
   background-color: rgb(249, 250, 251);
-}
-
-tbody tr:hover td {
-  background-color: rgb(243 244 246);
 }
 
 td {

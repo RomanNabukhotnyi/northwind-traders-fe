@@ -7,40 +7,66 @@
       <p class="menu-label">General</p>
       <ul class="menu-list">
         <li>
-          <a activeclassname="active" class="active" href="/" aria-current="page">
+          <a href="/" aria-current="page">
             <span class="icon material-icons">home</span>
             <span class="menu-item-label">Home</span>
           </a>
-          <a activeclassname="active" class="" href="/dash"><span
-              class="icon material-icons">display_settings</span><span class="menu-item-label">Dashboard</span></a>
+          <a activeclassname="active" class="" href="/dash"
+            ><span class="icon material-icons">display_settings</span
+            ><span class="menu-item-label">Dashboard</span></a
+          >
         </li>
       </ul>
       <p class="menu-label">Backoffice</p>
       <ul class="menu-list">
         <li>
-          <a activeclassname="active" class="" href="/suppliers"><span class="icon material-icons">inventory</span><span
-              class="menu-item-label">Suppliers</span></a>
+          <RouterLink
+            :class="{ active: router.currentRoute.value.path === '/suppliers' }"
+            to="/suppliers"
+          >
+            <span class="icon material-icons">inventory</span>
+            <span class="menu-item-label">Suppliers</span>
+          </RouterLink>
         </li>
         <li>
-          <a activeclassname="active" class="" href="/products"><span
-              class="icon material-icons">production_quantity_limits</span><span
-              class="menu-item-label">Products</span></a>
+          <RouterLink
+            :class="{ active: router.currentRoute.value.path === '/products' }"
+            to="/products"
+            ><span class="icon material-icons">production_quantity_limits</span
+            ><span class="menu-item-label">Products</span></RouterLink
+          >
         </li>
         <li>
-          <a activeclassname="active" class="" href="/orders"><span
-              class="icon material-icons">shopping_cart</span><span class="menu-item-label">Orders</span></a>
+          <RouterLink
+            :class="{ active: router.currentRoute.value.path === '/orders' }"
+            to="/orders"
+            ><span class="icon material-icons">shopping_cart</span
+            ><span class="menu-item-label">Orders</span></RouterLink
+          >
         </li>
         <li>
-          <a activeclassname="active" class="" href="/employees"><span class="icon material-icons">badge</span><span
-              class="menu-item-label">Employees</span></a>
+          <RouterLink
+            :class="{ active: router.currentRoute.value.path === '/employees' }"
+            to="/employees"
+            ><span class="icon material-icons">badge</span
+            ><span class="menu-item-label">Employees</span></RouterLink
+          >
         </li>
         <li>
-          <a activeclassname="active" class="" href="/customers"><span class="icon material-icons">group</span><span
-              class="menu-item-label">Customers</span></a>
+          <RouterLink
+            :class="{ active: router.currentRoute.value.path === '/customers' }"
+            to="/customers"
+            ><span class="icon material-icons">group</span
+            ><span class="menu-item-label">Customers</span></RouterLink
+          >
         </li>
         <li>
-          <a activeclassname="active" class="" href="/search"><span class="icon material-icons">search</span><span
-              class="menu-item-label">Search</span></a>
+          <RouterLink
+            :class="{ active: router.currentRoute.value.path === '/search' }"
+            to="/search"
+            ><span class="icon material-icons">search</span
+            ><span class="menu-item-label">Search</span></RouterLink
+          >
         </li>
       </ul>
     </div>
@@ -48,7 +74,28 @@
   <RouterView />
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useProductsStore } from '@/stores/products';
+import { useSuppliersStore } from '@/stores/suppliers';
+import { useOrdersStore } from '@/stores/orders';
+import { useEmployeesStore } from '@/stores/employees';
+import { useCustomersStore } from '@/stores/customers';
+const productsStore = useProductsStore();
+const suppliersStore = useSuppliersStore();
+const ordersStore = useOrdersStore();
+const employeesStore = useEmployeesStore();
+const customersStore = useCustomersStore();
+const router = useRouter();
+onMounted(() => {
+  productsStore.fetchProducts();
+  suppliersStore.fetchSuppliers();
+  ordersStore.fetchOrders();
+  employeesStore.fetchEmployees();
+  customersStore.fetchCustomers();
+});
+</script>
 
 <style scoped>
 .aside {

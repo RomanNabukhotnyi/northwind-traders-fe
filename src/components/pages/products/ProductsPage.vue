@@ -1,52 +1,43 @@
 <template>
   <section class="section main-section">
-    <div class="card has-table" v-if="suppliers.length">
+    <div class="card has-table" v-if="products.length">
       <header class="card-header">
-        <p class="card-header-title">Suppliers</p>
+        <p class="card-header-title">Products</p>
       </header>
       <div class="card-content">
         <table>
           <thead>
             <tr>
-              <th></th>
-              <th>Company</th>
-              <th>Contact</th>
-              <th>Title</th>
-              <th>City</th>
-              <th>Country</th>
+              <th>Name</th>
+              <th>Qt per unit</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Orders</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="supplier in suppliers[page]" :key="supplier.id">
-              <td class="image-cell">
-                <div class="image">
-                  <img
-                    :src="getAvatarUrl(supplier.contactName!)"
-                    class="rounded-full"
-                  />
-                </div>
-              </td>
+            <tr v-for="product in products[page]" :key="product.id">
               <td>
-                <a class="link" @click="openSupplier(supplier.id)">{{
-                  supplier.companyName
+                <a class="link" @click="openProduct(product.id)">{{
+                  product.name
                 }}</a>
               </td>
-              <td>{{ supplier.contactName }}</td>
-              <td>{{ supplier.contactTitle }}</td>
-              <td>{{ supplier.city }}</td>
-              <td>{{ supplier.country }}</td>
+              <td>{{ product.quantityPerUnit }}</td>
+              <td>${{ Number(product.unitPrice).toFixed(2) }}</td>
+              <td>{{ product.unitsInStock }}</td>
+              <td>{{ product.unitsOnOrder }}</td>
             </tr>
           </tbody>
         </table>
         <div class="table-pagination">
           <div class="pagination">
             <div class="buttons">
-              <div v-for="num in suppliers.length" :key="num">
+              <div v-for="num in products.length" :key="num">
                 <button
                   type="button"
                   class="button"
                   v-if="
-                    (num <= page + 7 || num >= suppliers.length - 1) &&
+                    (num <= page + 7 || num >= products.length - 1) &&
                     (num <= 2 || num >= page - 6)
                   "
                   :class="{ active: page === num - 1 }"
@@ -63,31 +54,25 @@
                 </button>
               </div>
             </div>
-            <small>Page {{ page + 1 }} of {{ suppliers.length }}</small>
+            <small>Page {{ page + 1 }} of {{ products.length }}</small>
           </div>
         </div>
       </div>
     </div>
-    <div class="card-content" v-else><h2>Loading suppliers...</h2></div>
+    <div class="card-content" v-else><h2>Loading products...</h2></div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useSuppliersStore } from '@/stores/suppliers';
-const suppliersStore = useSuppliersStore();
+import { useProductsStore } from '@/stores/products';
+const productsStore = useProductsStore();
 const router = useRouter();
-const suppliers = computed(() => suppliersStore.suppliersByPage);
+const products = computed(() => productsStore.productsByPage);
 const page = ref(0);
-const getAvatarUrl = (name: string) => {
-  const initials = name.split(' ');
-  return `https://avatars.dicebear.com/v2/initials/${initials[0]}-${
-    initials[initials.length - 1]
-  }.svg`;
-};
-const openSupplier = (id: number) => {
-  router.push(`/suppliers/${id}`);
+const openProduct = (id: number) => {
+  router.push(`/products/${id}`);
 };
 const selectPage = (num: number) => {
   page.value = num;
@@ -98,7 +83,15 @@ const selectPage = (num: number) => {
 .main-section {
   padding: 1.5rem;
 }
-
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
 .card {
   background-color: rgb(255, 255, 255);
   border-color: rgb(243, 244, 246);
@@ -112,19 +105,9 @@ const selectPage = (num: number) => {
   border-color: rgb(243, 244, 246);
   display: flex;
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-size: inherit;
-  font-weight: inherit;
-}
 .card-content {
   padding: 0;
 }
-
 .card-header-title {
   flex-grow: 1;
   font-weight: 700;
@@ -147,7 +130,6 @@ table {
   border-color: inherit;
   text-indent: 0;
 }
-
 thead {
   display: table-header-group;
 }

@@ -1,6 +1,7 @@
+<!-- eslint-disable vue/no-use-v-if-with-v-for -->
 <template>
   <section class="section main-section">
-    <div class="card has-table" v-if="suppliers.length">
+    <div class="card has-table" v-if="orders.length">
       <header class="card-header">
         <p class="card-header-title">Suppliers</p>
       </header>
@@ -8,45 +9,42 @@
         <table>
           <thead>
             <tr>
-              <th></th>
-              <th>Company</th>
-              <th>Contact</th>
-              <th>Title</th>
+              <th>Id</th>
+              <th>Total Price</th>
+              <th>Products</th>
+              <th>Quantity</th>
+              <th>Shipped</th>
+              <th>Ship Name</th>
               <th>City</th>
               <th>Country</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="supplier in suppliers[page]" :key="supplier.id">
-              <td class="image-cell">
-                <div class="image">
-                  <img
-                    :src="getAvatarUrl(supplier.contactName!)"
-                    class="rounded-full"
-                  />
-                </div>
-              </td>
+            <tr v-for="order in orders[page]" :key="order.id">
               <td>
-                <a class="link" @click="openSupplier(supplier.id)">{{
-                  supplier.companyName
-                }}</a>
+                <a class="link" @click="openOrder(order.id)">{{ order.id }}</a>
               </td>
-              <td>{{ supplier.contactName }}</td>
-              <td>{{ supplier.contactTitle }}</td>
-              <td>{{ supplier.city }}</td>
-              <td>{{ supplier.country }}</td>
+              <td>${{ Number(order.totalPrice).toFixed(2) }}</td>
+              <td>{{ order.totalProducts }}</td>
+              <td>{{ order.totalItems }}</td>
+              <td>
+                {{ new Date(order.shippedDate!).toLocaleDateString('en-CA') }}
+              </td>
+              <td>{{ order.shipName }}</td>
+              <td>{{ order.shipCity }}</td>
+              <td>{{ order.shipCountry }}</td>
             </tr>
           </tbody>
         </table>
         <div class="table-pagination">
           <div class="pagination">
             <div class="buttons">
-              <div v-for="num in suppliers.length" :key="num">
+              <div v-for="num in orders.length" :key="num">
                 <button
                   type="button"
                   class="button"
                   v-if="
-                    (num <= page + 7 || num >= suppliers.length - 1) &&
+                    (num <= page + 7 || num >= orders.length - 1) &&
                     (num <= 2 || num >= page - 6)
                   "
                   :class="{ active: page === num - 1 }"
@@ -63,34 +61,28 @@
                 </button>
               </div>
             </div>
-            <small>Page {{ page + 1 }} of {{ suppliers.length }}</small>
+            <small>Page {{ page + 1 }} of {{ orders.length }}</small>
           </div>
         </div>
       </div>
     </div>
-    <div class="card-content" v-else><h2>Loading suppliers...</h2></div>
+    <div class="card-content" v-else><h2>Loading orders...</h2></div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useSuppliersStore } from '@/stores/suppliers';
-const suppliersStore = useSuppliersStore();
+import { useOrdersStore } from '@/stores/orders';
+const ordersStore = useOrdersStore();
 const router = useRouter();
-const suppliers = computed(() => suppliersStore.suppliersByPage);
+const orders = computed(() => ordersStore.ordersByPage);
 const page = ref(0);
-const getAvatarUrl = (name: string) => {
-  const initials = name.split(' ');
-  return `https://avatars.dicebear.com/v2/initials/${initials[0]}-${
-    initials[initials.length - 1]
-  }.svg`;
-};
-const openSupplier = (id: number) => {
-  router.push(`/suppliers/${id}`);
-};
 const selectPage = (num: number) => {
   page.value = num;
+};
+const openOrder = (id: number) => {
+  router.push(`/orders/${id}`);
 };
 </script>
 
@@ -124,7 +116,6 @@ h6 {
 .card-content {
   padding: 0;
 }
-
 .card-header-title {
   flex-grow: 1;
   font-weight: 700;
@@ -147,7 +138,6 @@ table {
   border-color: inherit;
   text-indent: 0;
 }
-
 thead {
   display: table-header-group;
 }
@@ -166,10 +156,6 @@ th {
 
 tr:nth-child(odd) td {
   background-color: rgb(249, 250, 251);
-}
-
-tbody tr:hover td {
-  background-color: rgb(243 244 246);
 }
 
 td {
