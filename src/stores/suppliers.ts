@@ -16,21 +16,26 @@ interface Supplier {
 }
 
 interface State {
+  suppliersByPage: Supplier[][];
   suppliers: Supplier[];
 }
 
 export const useSuppliersStore = defineStore('suppliers', {
   state: (): State => ({
+    suppliersByPage: [],
     suppliers: [],
   }),
-  getters: {
-    getSuppliers: (state) => state.suppliers,
-  },
   actions: {
     async fetchSuppliers() {
       const response = await fetch('http://localhost:4000/suppliers');
       const suppliers = (await response.json()).data as Supplier[];
       this.suppliers = suppliers;
+      const size = 20;
+      const result = [];
+      for (let i = 0; i < Math.ceil(suppliers.length / size); i++) {
+        result[i] = suppliers.slice(i * size, i * size + size);
+      }
+      this.suppliersByPage = result;
     },
   },
 });
