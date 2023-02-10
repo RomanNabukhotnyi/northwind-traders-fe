@@ -10,7 +10,7 @@
                 <input
                   placeholder="Enter keyword..."
                   class="input w-1/2"
-                  value=""
+                  v-model="searchTerm"
                 /><span class="icon left material-icons">search</span>
               </div>
             </div>
@@ -25,7 +25,8 @@
                   ><input
                     type="radio"
                     name="table-radio"
-                    value="one"
+                    value="products"
+                    v-model="table"
                     checked
                   /><span class="check"></span
                   ><span class="control-label">Products</span></label
@@ -33,9 +34,12 @@
               </div>
               <div class="control">
                 <label class="radio"
-                  ><input type="radio" name="table-radio" value="two" /><span
-                    class="check"
-                  ></span
+                  ><input
+                    type="radio"
+                    name="table-radio"
+                    value="customers"
+                    v-model="table"
+                  /><span class="check"></span
                   ><span class="control-label">Customers</span></label
                 >
               </div>
@@ -43,7 +47,33 @@
           </div>
         </div>
         <p class="text-black font-bold text-lg">Search results</p>
-        <p class="mt-6">No results</p>
+        <div v-if="table === 'products' && products.length">
+          <div v-for="(product, index) of products" :key="product.id">
+            <p class="text-base mt-2 link">
+              <a @click="openProduct(product.id)">{{ product.name }}</a>
+            </p>
+            <p class="text-gray-400 text-sm">
+              #{{ index + 1 }}, Quantity Per Unit:
+              {{ product.quantityPerUnit }}, Price:
+              {{ Number(product.unitPrice) }}, Stock:
+              {{ product.unitsInStock }}
+            </p>
+          </div>
+        </div>
+        <div v-else-if="table === 'customers' && customers.length">
+          <div v-for="(customer, index) of customers" :key="customer.id">
+            <p class="text-base mt-2 link">
+              <a @click="openCustomer(customer.id)">{{
+                customer.companyName
+              }}</a>
+            </p>
+            <p class="text-gray-400 text-sm">
+              #{{ index + 1 }}, Contact: {{ customer.contactName }}, Title:
+              {{ customer.contactTitle }}, Phone: {{ customer.phone }}
+            </p>
+          </div>
+        </div>
+        <p v-else class="mt-6">No results</p>
       </div>
     </div>
   </section>
@@ -52,22 +82,32 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useSuppliersStore } from '@/stores/suppliers';
-const suppliersStore = useSuppliersStore();
+import { useProductsStore } from '@/stores/products';
+import { useCustomersStore } from '@/stores/customers';
+const productsStore = useProductsStore();
+const customersStore = useCustomersStore();
 const router = useRouter();
-const suppliers = computed(() => suppliersStore.suppliersByPage);
-const page = ref(0);
-const getAvatarUrl = (name: string) => {
-  const initials = name.split(' ');
-  return `https://avatars.dicebear.com/v2/initials/${initials[0]}-${
-    initials[initials.length - 1]
-  }.svg`;
+const searchTerm = ref('');
+const table = ref('products');
+const products = computed(() =>
+  productsStore.products.filter(
+    (p) =>
+      p.name.toLowerCase().includes(searchTerm.value.toLowerCase()) &&
+      searchTerm.value
+  )
+);
+const customers = computed(() =>
+  customersStore.customers.filter(
+    (c) =>
+      c.companyName.toLowerCase().includes(searchTerm.value.toLowerCase()) &&
+      searchTerm.value
+  )
+);
+const openProduct = (id: number) => {
+  router.push(`/products/${id}`);
 };
-const openSupplier = (id: number) => {
-  router.push(`/suppliers/${id}`);
-};
-const selectPage = (num: number) => {
-  page.value = num;
+const openCustomer = (id: string) => {
+  router.push(`/customers/${id}`);
 };
 </script>
 
@@ -84,6 +124,45 @@ const selectPage = (num: number) => {
 }
 .mt-6 {
   margin-top: 1.5rem;
+}
+.link {
+  --tw-text-opacity: 1;
+  color: rgb(37 99 235 / var(--tw-text-opacity));
+  cursor: pointer;
+}
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+blockquote,
+dd,
+dl,
+figure,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+p,
+pre {
+  margin: 0;
+}
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+.text-gray-400 {
+  --tw-text-opacity: 1;
+  color: rgb(156 163 175 / var(--tw-text-opacity));
+}
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 .card-content {
   padding: 1.5rem;
