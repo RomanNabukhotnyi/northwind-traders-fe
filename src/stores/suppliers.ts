@@ -16,26 +16,49 @@ interface Supplier {
 }
 
 interface State {
-  suppliersByPage: Supplier[][];
   suppliers: Supplier[];
+  loading: boolean;
 }
 
 export const useSuppliersStore = defineStore('suppliers', {
   state: (): State => ({
-    suppliersByPage: [],
     suppliers: [],
+    loading: false,
   }),
   actions: {
+    async create(supplier: Supplier) {
+      this.loading = true;
+      const response = await fetch('http://localhost:4000/suppliers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(supplier),
+      });
+      const data = await response.json();
+      this.suppliers.push(data.data);
+      this.loading = false;
+    },
+    getAllByPage() {
+      const size = 20;
+      const result = [];
+      for (let i = 0; i < Math.ceil(this.suppliers.length / size); i++) {
+        result[i] = this.suppliers.slice(i * size, i * size + size);
+      }
+      return result;
+    },
+    async delete(id: number) {
+      this.loading = true;
+      await fetch(`http://localhost:4000/suppliers/${id}`, {
+        method: 'DELETE',
+      });
+      this.suppliers = this.suppliers.filter((s) => s.id !== id);
+      this.loading = false;
+    },
     async fetchSuppliers() {
       const response = await fetch('http://localhost:4000/suppliers');
       const suppliers = (await response.json()).data as Supplier[];
       this.suppliers = suppliers;
-      const size = 20;
-      const result = [];
-      for (let i = 0; i < Math.ceil(suppliers.length / size); i++) {
-        result[i] = suppliers.slice(i * size, i * size + size);
-      }
-      this.suppliersByPage = result;
     },
   },
 });

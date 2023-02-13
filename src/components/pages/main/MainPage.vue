@@ -1,10 +1,13 @@
 <template>
+  <MyDialog v-model:show="loginVisible">
+    <LoginForm @login="login" :loading="loginLoading" />
+  </MyDialog>
   <aside class="aside">
     <div class="title">
       <span><b class="font-weight">Northwind</b> Traders</span>
     </div>
     <div class="menu">
-      <p class="menu-label">General</p>
+      <!-- <p class="menu-label">General</p>
       <ul class="menu-list">
         <li>
           <a href="/" aria-current="page">
@@ -16,7 +19,7 @@
             ><span class="menu-item-label">Dashboard</span></a
           >
         </li>
-      </ul>
+      </ul> -->
       <p class="menu-label">Backoffice</p>
       <ul class="menu-list">
         <li>
@@ -70,24 +73,46 @@
         </li>
       </ul>
     </div>
+    <MyButton v-if="!isAdmin" class="adminBtn" @click="showLoginForm"
+      >Admin</MyButton
+    >
+    <MyButton v-else class="logoutBtn" @click="logout">Logout</MyButton>
   </aside>
   <RouterView />
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useUsersStore } from '@/stores/users';
 import { useProductsStore } from '@/stores/products';
 import { useSuppliersStore } from '@/stores/suppliers';
 import { useOrdersStore } from '@/stores/orders';
 import { useEmployeesStore } from '@/stores/employees';
 import { useCustomersStore } from '@/stores/customers';
+import MyButton from '@/components/common/MyButton.vue';
+import MyDialog from '@/components/common/MyDialog.vue';
+import LoginForm from './components/LoginForm.vue';
 const productsStore = useProductsStore();
 const suppliersStore = useSuppliersStore();
 const ordersStore = useOrdersStore();
 const employeesStore = useEmployeesStore();
 const customersStore = useCustomersStore();
+const usersStore = useUsersStore();
 const router = useRouter();
+const loginVisible = ref(false);
+const isAdmin = computed(() => usersStore.isAdmin);
+const loginLoading = computed(() => usersStore.loading);
+const showLoginForm = () => {
+  loginVisible.value = true;
+};
+const login = (password: string) => {
+  usersStore.login(password);
+  loginVisible.value = false;
+};
+const logout = () => {
+  usersStore.logout();
+};
 onMounted(() => {
   productsStore.fetchProducts();
   suppliersStore.fetchSuppliers();
@@ -98,6 +123,19 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.adminBtn {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+}
+.logoutBtn {
+  position: absolute;
+  background-color: #ff4747;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+}
 .aside {
   height: 100vh;
   width: 15rem;

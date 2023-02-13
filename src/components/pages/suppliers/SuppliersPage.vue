@@ -1,8 +1,14 @@
 <template>
+  <MyDialog v-model:show="createVisible">
+    <CreateSupplier @create="createSupplier" :loading="createLoading" />
+  </MyDialog>
   <section class="section main-section">
     <div class="card has-table" v-if="suppliers.length">
       <header class="card-header">
         <p class="card-header-title">Suppliers</p>
+        <MyButton v-if="isAdmin" class="createBtn" @click="openCreate"
+          >Create</MyButton
+        >
       </header>
       <div class="card-content">
         <table>
@@ -14,6 +20,7 @@
               <th>Title</th>
               <th>City</th>
               <th>Country</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -35,6 +42,14 @@
               <td>{{ supplier.contactTitle }}</td>
               <td>{{ supplier.city }}</td>
               <td>{{ supplier.country }}</td>
+              <td>
+                <MyButton
+                  v-if="isAdmin"
+                  class="deleteBtn"
+                  @click="deleteSupplier(supplier.id)"
+                  >Delete</MyButton
+                >
+              </td>
             </tr>
           </tbody>
         </table>
@@ -76,15 +91,34 @@
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSuppliersStore } from '@/stores/suppliers';
+import { useUsersStore } from '@/stores/users';
+import MyButton from '@/components/common/MyButton.vue';
+import CreateSupplier from './components/CreateSupplier.vue';
+import MyDialog from '@/components/common/MyDialog.vue';
 const suppliersStore = useSuppliersStore();
+const usersStore = useUsersStore();
 const router = useRouter();
-const suppliers = computed(() => suppliersStore.suppliersByPage);
+const suppliers = computed(() => suppliersStore.getAllByPage());
+const createLoading = computed(() => suppliersStore.loading);
+const isAdmin = computed(() => usersStore.isAdmin);
 const page = ref(0);
+const createVisible = ref(false);
 const getAvatarUrl = (name: string) => {
+  if (!name) return '';
   const initials = name.split(' ');
   return `https://avatars.dicebear.com/v2/initials/${initials[0]}-${
     initials[initials.length - 1]
   }.svg`;
+};
+const openCreate = () => {
+  createVisible.value = true;
+};
+const createSupplier = (supplier: any) => {
+  suppliersStore.create(supplier);
+  createVisible.value = false;
+};
+const deleteSupplier = (id: number) => {
+  suppliersStore.delete(id);
 };
 const openSupplier = (id: number) => {
   router.push(`/suppliers/${id}`);
@@ -95,6 +129,12 @@ const selectPage = (num: number) => {
 </script>
 
 <style scoped>
+.createBtn {
+  width: 10%;
+}
+.deleteBtn {
+  background-color: #ff4747;
+}
 .main-section {
   padding: 1.5rem;
 }

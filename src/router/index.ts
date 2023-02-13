@@ -19,6 +19,7 @@ const router = createRouter({
       path: '/',
       name: 'main',
       component: Main,
+      redirect: '/suppliers',
       children: [
         {
           path: 'suppliers',
