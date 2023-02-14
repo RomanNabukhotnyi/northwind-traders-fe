@@ -1,8 +1,28 @@
 <template>
+  <MyDialog v-model:show="createVisible">
+    <CreateProduct
+      @create="createProduct"
+      :loading="loading"
+      :suppliers="suppliers"
+      :categories="categories"
+    />
+  </MyDialog>
+  <MyDialog v-model:show="editVisible">
+    <EditProduct
+      :product="editingProduct!"
+      :loading="loading"
+      :suppliers="suppliers"
+      :categories="categories"
+      @update="editProduct"
+    />
+  </MyDialog>
   <section class="section main-section">
     <div class="card has-table" v-if="products.length">
       <header class="card-header">
         <p class="card-header-title">Products</p>
+        <MyButton v-if="isAdmin" class="createBtn" @click="openCreate">
+          Create
+        </MyButton>
       </header>
       <div class="card-content">
         <table>
@@ -13,6 +33,7 @@
               <th>Price</th>
               <th>Stock</th>
               <th>Orders</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -26,6 +47,20 @@
               <td>${{ Number(product.unitPrice).toFixed(2) }}</td>
               <td>{{ product.unitsInStock }}</td>
               <td>{{ product.unitsOnOrder }}</td>
+              <td class="actions">
+                <MyButton
+                  v-if="isAdmin"
+                  class="editBtn"
+                  @click="openEdit(product)"
+                  >Edit</MyButton
+                >
+                <MyButton
+                  v-if="isAdmin"
+                  class="deleteBtn"
+                  @click="deleteProduct(product.id)"
+                  >Delete</MyButton
+                >
+              </td>
             </tr>
           </tbody>
         </table>
@@ -67,10 +102,55 @@
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProductsStore } from '@/stores/products';
+import { useSuppliersStore } from '@/stores/suppliers';
+import { useCategoriesStore } from '@/stores/categories';
+import { useUsersStore } from '@/stores/users';
+import MyDialog from '@/components/common/MyDialog.vue';
+import CreateProduct from './components/CreateProduct.vue';
+import EditProduct from './components/EditProduct.vue';
+import MyButton from '@/components/common/MyButton.vue';
 const productsStore = useProductsStore();
+const suppliersStore = useSuppliersStore();
+const categoriesStore = useCategoriesStore();
+const usersStore = useUsersStore();
 const router = useRouter();
-const products = computed(() => productsStore.productsByPage);
+const products = computed(() => productsStore.getAllByPage());
+const suppliers = computed(() => suppliersStore.suppliers);
+const categories = computed(() => categoriesStore.categories);
+const isAdmin = computed(() => usersStore.isAdmin);
 const page = ref(0);
+const loading = computed(() => productsStore.loading);
+const createVisible = ref(false);
+const editVisible = ref(false);
+const openCreate = () => {
+  createVisible.value = true;
+};
+const createProduct = (product: {
+  name: string;
+  supplierId: number;
+  categoryId: number;
+  quantityPerUnit: string;
+  unitPrice: number;
+  unitsInStock: number;
+  unitsOnOrder: number;
+  reorderLevel: number;
+  discontinued: boolean;
+}) => {
+  productsStore.create(product);
+  createVisible.value = false;
+};
+const editingProduct = ref(null);
+const openEdit = (product: any) => {
+  editingProduct.value = product;
+  editVisible.value = true;
+};
+const editProduct = (product: any) => {
+  productsStore.update(product);
+  editVisible.value = false;
+};
+const deleteProduct = (id: number) => {
+  productsStore.delete(id);
+};
 const openProduct = (id: number) => {
   router.push(`/products/${id}`);
 };
@@ -80,6 +160,25 @@ const selectPage = (num: number) => {
 </script>
 
 <style scoped>
+.actions {
+  display: flex;
+  justify-content: right;
+}
+.deleteBtn {
+  background-color: #ff4747;
+  width: 75px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+.editBtn {
+  background-color: #ffc038;
+  width: 75px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.createBtn {
+  width: 10%;
+}
 .main-section {
   padding: 1.5rem;
 }

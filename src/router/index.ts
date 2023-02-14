@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Main from '../components/pages/main/MainPage.vue';
 import Suppliers from '../components/pages/suppliers/SuppliersPage.vue';
-import Supplier from '../components/pages/suppliers/components/SupplierPage.vue';
+import Supplier from '../components/pages/suppliers/SupplierPage.vue';
 import Products from '../components/pages/products/ProductsPage.vue';
-import Product from '../components/pages/products/components/ProductPage.vue';
+import Product from '../components/pages/products/ProductPage.vue';
 import Orders from '../components/pages/orders/OrdersPage.vue';
 import Order from '../components/pages/orders/components/OrderPage.vue';
 import Employees from '../components/pages/employees/EmployeesPage.vue';

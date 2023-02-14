@@ -90,6 +90,7 @@ import { useSuppliersStore } from '@/stores/suppliers';
 import { useOrdersStore } from '@/stores/orders';
 import { useEmployeesStore } from '@/stores/employees';
 import { useCustomersStore } from '@/stores/customers';
+import { useCategoriesStore } from '@/stores/categories';
 import MyButton from '@/components/common/MyButton.vue';
 import MyDialog from '@/components/common/MyDialog.vue';
 import LoginForm from './components/LoginForm.vue';
@@ -98,6 +99,7 @@ const suppliersStore = useSuppliersStore();
 const ordersStore = useOrdersStore();
 const employeesStore = useEmployeesStore();
 const customersStore = useCustomersStore();
+const categoriesStore = useCategoriesStore();
 const usersStore = useUsersStore();
 const router = useRouter();
 const loginVisible = ref(false);
@@ -119,6 +121,7 @@ onMounted(() => {
   ordersStore.fetchOrders();
   employeesStore.fetchEmployees();
   customersStore.fetchCustomers();
+  categoriesStore.fetchCategories();
 });
 </script>
 

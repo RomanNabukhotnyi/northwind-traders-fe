@@ -47,6 +47,24 @@ export const useSuppliersStore = defineStore('suppliers', {
       }
       return result;
     },
+    async update(supplier: Supplier) {
+      this.loading = true;
+      const response = await fetch(
+        `http://localhost:4000/suppliers/${supplier.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(supplier),
+        }
+      );
+      const data = await response.json();
+      this.suppliers = this.suppliers.map((s) =>
+        s.id === supplier.id ? data.data : s
+      );
+      this.loading = false;
+    },
     async delete(id: number) {
       this.loading = true;
       await fetch(`http://localhost:4000/suppliers/${id}`, {

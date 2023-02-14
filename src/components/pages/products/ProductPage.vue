@@ -1,4 +1,13 @@
 <template>
+  <MyDialog v-model:show="editVisible">
+    <EditProduct
+      :product="product!"
+      :loading="loading"
+      @update="editProduct"
+      :categories="categories"
+      :suppliers="suppliers"
+    />
+  </MyDialog>
   <section class="section main-section">
     <div class="card mb-6">
       <header class="card-header">
@@ -6,6 +15,12 @@
           <span class="icon material-icons">ballot</span
           ><span class="ml-2">Product information</span>
         </p>
+        <MyButton v-if="isAdmin" class="editBtn" @click="openEdit"
+          >Edit</MyButton
+        >
+        <MyButton v-if="isAdmin" class="deleteBtn" @click="deleteProduct"
+          >Delete</MyButton
+        >
       </header>
       <div class="card-content">
         <div class="grid grid-cols-2 gap-4">
@@ -110,16 +125,38 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProductsStore } from '@/stores/products';
 import { useSuppliersStore } from '@/stores/suppliers';
+import { useUsersStore } from '@/stores/users';
+import { useCategoriesStore } from '@/stores/categories';
+import MyButton from '@/components/common/MyButton.vue';
+import MyDialog from '@/components/common/MyDialog.vue';
+import EditProduct from './components/EditProduct.vue';
 const productsStore = useProductsStore();
 const suppliersStore = useSuppliersStore();
+const categoriesStore = useCategoriesStore();
+const usersStore = useUsersStore();
+const isAdmin = computed(() => usersStore.isAdmin);
 const router = useRouter();
+const editVisible = ref(false);
+const loading = computed(() => productsStore.loading);
+const suppliers = computed(() => suppliersStore.suppliers);
+const categories = computed(() => categoriesStore.categories);
+const openEdit = () => {
+  editVisible.value = true;
+};
+const editProduct = (product: any) => {
+  productsStore.update(product);
+  editVisible.value = false;
+};
 const openSupplier = (id: number) => {
-  suppliersStore.fetchSuppliers();
   router.push(`/suppliers/${id}`);
+};
+const deleteProduct = () => {
+  productsStore.delete(product.value!.id!);
+  router.push('/products');
 };
 const product = computed(() =>
   productsStore.products.find(
@@ -129,6 +166,18 @@ const product = computed(() =>
 </script>
 
 <style scoped>
+.editBtn {
+  background-color: #ffc038;
+  width: 75px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.deleteBtn {
+  background-color: #ff4747;
+  width: 75px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
 .main-section {
   padding: 1.5rem;
 }

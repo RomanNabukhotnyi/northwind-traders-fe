@@ -1,6 +1,13 @@
 <template>
   <MyDialog v-model:show="createVisible">
-    <CreateSupplier @create="createSupplier" :loading="createLoading" />
+    <CreateSupplier @create="createSupplier" :loading="loading" />
+  </MyDialog>
+  <MyDialog v-model:show="editVisible">
+    <EditSupplier
+      :supplier="editingSupplier!"
+      :loading="loading"
+      @update="editSupplier"
+    />
   </MyDialog>
   <section class="section main-section">
     <div class="card has-table" v-if="suppliers.length">
@@ -42,7 +49,13 @@
               <td>{{ supplier.contactTitle }}</td>
               <td>{{ supplier.city }}</td>
               <td>{{ supplier.country }}</td>
-              <td>
+              <td class="actions">
+                <MyButton
+                  v-if="isAdmin"
+                  class="editBtn"
+                  @click="openEdit(supplier)"
+                  >Edit</MyButton
+                >
                 <MyButton
                   v-if="isAdmin"
                   class="deleteBtn"
@@ -94,15 +107,17 @@ import { useSuppliersStore } from '@/stores/suppliers';
 import { useUsersStore } from '@/stores/users';
 import MyButton from '@/components/common/MyButton.vue';
 import CreateSupplier from './components/CreateSupplier.vue';
+import EditSupplier from './components/EditSupplier.vue';
 import MyDialog from '@/components/common/MyDialog.vue';
 const suppliersStore = useSuppliersStore();
 const usersStore = useUsersStore();
 const router = useRouter();
 const suppliers = computed(() => suppliersStore.getAllByPage());
-const createLoading = computed(() => suppliersStore.loading);
+const loading = computed(() => suppliersStore.loading);
 const isAdmin = computed(() => usersStore.isAdmin);
 const page = ref(0);
 const createVisible = ref(false);
+const editVisible = ref(false);
 const getAvatarUrl = (name: string) => {
   if (!name) return '';
   const initials = name.split(' ');
@@ -113,9 +128,18 @@ const getAvatarUrl = (name: string) => {
 const openCreate = () => {
   createVisible.value = true;
 };
+const editingSupplier = ref(null);
+const openEdit = (supplier: any) => {
+  editingSupplier.value = supplier;
+  editVisible.value = true;
+};
 const createSupplier = (supplier: any) => {
   suppliersStore.create(supplier);
   createVisible.value = false;
+};
+const editSupplier = (supplier: any) => {
+  suppliersStore.update(supplier);
+  editVisible.value = false;
 };
 const deleteSupplier = (id: number) => {
   suppliersStore.delete(id);
@@ -132,8 +156,21 @@ const selectPage = (num: number) => {
 .createBtn {
   width: 10%;
 }
+.actions {
+  display: flex;
+  justify-content: right;
+}
 .deleteBtn {
   background-color: #ff4747;
+  width: 75px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+.editBtn {
+  background-color: #ffc038;
+  width: 75px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
 }
 .main-section {
   padding: 1.5rem;

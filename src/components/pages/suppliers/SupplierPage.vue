@@ -1,4 +1,11 @@
 <template>
+  <MyDialog v-model:show="editVisible">
+    <EditSupplier
+      :supplier="supplier!"
+      :loading="editLoading"
+      @update="updateSupplier"
+    />
+  </MyDialog>
   <section class="section main-section">
     <div class="card mb-6">
       <header class="card-header">
@@ -6,6 +13,12 @@
           <span class="icon material-icons">ballot</span>
           <span class="ml-2">Supplier information</span>
         </p>
+        <MyButton v-if="isAdmin" class="editBtn" @click="openEdit"
+          >Edit</MyButton
+        >
+        <MyButton v-if="isAdmin" class="deleteBtn" @click="deleteSupplier"
+          >Delete</MyButton
+        >
       </header>
       <div class="card-content">
         <div class="grid grid-cols-2 gap-4">
@@ -108,21 +121,65 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSuppliersStore } from '@/stores/suppliers';
+import { useUsersStore } from '@/stores/users';
+import MyDialog from '@/components/common/MyDialog.vue';
+import EditSupplier from './components/EditSupplier.vue';
+import MyButton from '@/components/common/MyButton.vue';
 const suppliersStore = useSuppliersStore();
+const usersStore = useUsersStore();
+const isAdmin = computed(() => usersStore.isAdmin);
 const router = useRouter();
+const editLoading = computed(() => suppliersStore.loading);
 const supplier = computed(() =>
   suppliersStore.suppliers.find(
     (s) => s.id === Number(router.currentRoute.value.params.id)
   )
 );
+const editVisible = ref(false);
+const openEdit = () => {
+  editVisible.value = true;
+};
+const updateSupplier = (supplier: {
+  id: number;
+  companyName: string;
+  contactName: string | null;
+  contactTitle: string | null;
+  address: string | null;
+  city: string | null;
+  region: string | null;
+  postalCode: string | null;
+  country: string | null;
+  phone: string | null;
+  fax: string | null;
+  homePage: string | null;
+}) => {
+  suppliersStore.update(supplier);
+  editVisible.value = false;
+};
+const deleteSupplier = () => {
+  suppliersStore.delete(supplier.value!.id);
+  router.push('/suppliers');
+};
 </script>
 
 <style scoped>
 .main-section {
   padding: 1.5rem;
+}
+.editBtn {
+  background-color: #ffc038;
+  width: 75px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.deleteBtn {
+  background-color: #ff4747;
+  width: 75px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
 }
 
 .mb-6 {
