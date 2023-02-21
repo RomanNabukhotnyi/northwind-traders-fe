@@ -1,4 +1,12 @@
 <template>
+  <MyDialog v-model:show="editVisible">
+    <EditEmployee
+      :employee="employee!"
+      :employees="employees"
+      :loading="loading"
+      @update="editEmployee"
+    />
+  </MyDialog>
   <section class="section main-section">
     <div class="card mb-6">
       <header class="card-header">
@@ -6,6 +14,12 @@
           <span class="icon material-icons">ballot</span
           ><span class="ml-2">Employee information</span>
         </p>
+        <MyButton v-if="isAdmin" class="editBtn" @click="openEdit"
+          >Edit</MyButton
+        >
+        <MyButton v-if="isAdmin" class="deleteBtn" @click="deleteEmployee"
+          >Delete</MyButton
+        >
       </header>
       <div class="card-content">
         <div class="grid grid-cols-2 gap-4">
@@ -160,11 +174,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useEmployeesStore } from '@/stores/employees';
+import MyButton from '@/components/common/MyButton.vue';
+import MyDialog from '@/components/common/MyDialog.vue';
+import EditEmployee from '@/components/pages/employees/components/EditEmployee.vue';
+import { useUsersStore } from '@/stores/users';
 const employeesStore = useEmployeesStore();
+const usersStore = useUsersStore();
+const isAdmin = computed(() => usersStore.isAdmin);
 const router = useRouter();
+const loading = computed(() => employeesStore.loading);
+const editVisible = ref(false);
 const openEmployee = (id: number | null | undefined) => {
   router.push(`/employees/${id}`);
 };
@@ -178,9 +200,33 @@ const employee = computed(() =>
     (p) => p.id === Number(router.currentRoute.value.params.id)
   )
 );
+const employees = computed(() => employeesStore.employees);
+const openEdit = () => {
+  editVisible.value = true;
+};
+const editEmployee = (employee: any) => {
+  employee.update(employee);
+  editVisible.value = false;
+};
+const deleteEmployee = () => {
+  employeesStore.delete(employee.value!.id);
+  router.push('/employees');
+};
 </script>
 
 <style scoped>
+.editBtn {
+  background-color: #ffc038;
+  width: 75px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.deleteBtn {
+  background-color: #ff4747;
+  width: 75px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
 .main-section {
   padding: 1.5rem;
 }

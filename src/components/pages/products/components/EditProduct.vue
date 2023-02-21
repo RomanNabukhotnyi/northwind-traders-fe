@@ -103,20 +103,6 @@
         </p>
       </div> -->
     </div>
-    <div class="field">
-      <!-- <MyInput
-        class="input"
-        name="phone"
-        placeholder="Phone"
-        v-model="form.phone.value"
-      />
-      <div v-if="form.phone.value.length !== 0">
-        <p v-if="form.phone.errors.maxLength" class="error">
-          Phone length can't be more then 24. Now it is
-          {{ form.phone.value.length }}.
-        </p>
-      </div> -->
-    </div>
     <MyButton class="button" @click="update" :disabled="!form.valid || loading">
       <p v-if="!loading">Edit</p>
       <div v-else class="loadingio-spinner-ellipsis-yg3d79y87xd">
@@ -133,7 +119,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
 import Multiselect from 'vue-multiselect';
 import MyButton from '@/components/common/MyButton.vue';
 import MyInput from '@/components/common/MyInput.vue';

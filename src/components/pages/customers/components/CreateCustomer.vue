@@ -3,70 +3,80 @@
     <div class="field">
       <MyInput
         class="input"
-        name="name"
-        placeholder="Name"
-        v-model="form.name.value"
+        name="companyName"
+        placeholder="Company name"
+        v-model="form.companyName.value"
       />
-      <div v-if="!form.name.errors.required">
-        <p v-if="form.name.errors.maxLength" class="error">
-          Name length can't be more then 40. Now it is
-          {{ form.name.value.length }}.
+      <div v-if="!form.companyName.errors.required">
+        <p v-if="form.companyName.errors.maxLength" class="error">
+          Company name length can't be more then 40. Now it is
+          {{ form.companyName.value.length }}.
         </p>
       </div>
       <p v-else class="error">Field is required.</p>
     </div>
     <div class="field">
-      <Multiselect
-        v-model="form.supplier.value"
-        :options="suppliers"
-        placeholder="Supplier"
-        label="companyName"
-        track-by="id"
-      ></Multiselect>
-    </div>
-    <div class="field">
-      <Multiselect
-        v-model="form.category.value"
-        :options="categories"
-        placeholder="Category"
-        label="name"
-        track-by="id"
-      ></Multiselect>
-    </div>
-    <div class="field">
       <MyInput
         class="input"
-        name="quantityPerUnit"
-        placeholder="Quantity per unit"
-        v-model="form.quantityPerUnit.value"
+        name="contactName"
+        placeholder="Contact name"
+        v-model="form.contactName.value"
       />
-      <div v-if="form.quantityPerUnit.value.length !== 0">
-        <p v-if="form.quantityPerUnit.errors.maxLength" class="error">
-          Quantity per unit length can't be more then 20. Now it is
-          {{ form.quantityPerUnit.value.length }}.
-        </p>
-      </div>
-    </div>
-    <div class="field">
-      <MyInput
-        class="input"
-        name="unitPrice"
-        placeholder="Unit price"
-        v-model="form.unitPrice.value"
-      />
-      <!-- <div v-if="form.unitPrice.value.length !== 0">
-        <p v-if="form.city.errors.maxLength" class="error">
-          City length can't be more then 15. Now it is
-          {{ form.unitPrice.value.length }}.
+      <!-- <div v-if="form.contactName.value.length !== 0">
+        <p v-if="form.contactName.errors.maxLength" class="error">
+          Contact name length can't be more then 30. Now it is
+          {{ form.contactName.value.length }}.
         </p>
       </div> -->
     </div>
     <div class="field">
       <MyInput
         class="input"
-        name="unitsInStock"
-        placeholder="Units in stock"
-        v-model="form.unitsInStock.value"
+        name="contactTitle"
+        placeholder="Contact title"
+        v-model="form.contactTitle.value"
+      />
+      <!-- <div v-if="form.contactTitle.value.length !== 0">
+        <p v-if="form.contactTitle.errors.maxLength" class="error">
+          Contact title length can't be more then 30. Now it is
+          {{ form.contactTitle.value.length }}.
+        </p>
+      </div> -->
+    </div>
+    <div class="field">
+      <MyInput
+        class="input"
+        name="address"
+        placeholder="Address"
+        v-model="form.address.value"
+      />
+      <!-- <div v-if="form.address.value.length !== 0">
+        <p v-if="form.address.errors.maxLength" class="error">
+          Address length can't be more then 60. Now it is
+          {{ form.address.value.length }}.
+        </p>
+      </div> -->
+    </div>
+    <div class="field">
+      <MyInput
+        class="input"
+        name="city"
+        placeholder="City"
+        v-model="form.city.value"
+      />
+      <!-- <div v-if="form.city.value.length !== 0">
+        <p v-if="form.city.errors.maxLength" class="error">
+          City length can't be more then 15. Now it is
+          {{ form.city.value.length }}.
+        </p>
+      </div> -->
+    </div>
+    <div class="field">
+      <MyInput
+        class="input"
+        name="region"
+        placeholder="Region"
+        v-model="form.region.value"
       />
       <!-- <div v-if="form.region.value.length !== 0">
         <p v-if="form.region.errors.maxLength" class="error">
@@ -78,9 +88,9 @@
     <div class="field">
       <MyInput
         class="input"
-        name="unitsOnOrder"
-        placeholder="Units on order"
-        v-model="form.unitsOnOrder.value"
+        name="postalCode"
+        placeholder="Postal code"
+        v-model="form.postalCode.value"
       />
       <!-- <div v-if="form.postalCode.value.length !== 0">
         <p v-if="form.postalCode.errors.maxLength" class="error">
@@ -92,14 +102,42 @@
     <div class="field">
       <MyInput
         class="input"
-        name="reorderLevel"
-        placeholder="Reorder level"
-        v-model="form.reorderLevel.value"
+        name="country"
+        placeholder="Country"
+        v-model="form.country.value"
       />
       <!-- <div v-if="form.country.value.length !== 0">
         <p v-if="form.country.errors.maxLength" class="error">
           Country length can't be more then 15. Now it is
           {{ form.country.value.length }}.
+        </p>
+      </div> -->
+    </div>
+    <div class="field">
+      <MyInput
+        class="input"
+        name="phone"
+        placeholder="Phone"
+        v-model="form.phone.value"
+      />
+      <!-- <div v-if="form.phone.value.length !== 0">
+        <p v-if="form.phone.errors.maxLength" class="error">
+          Phone length can't be more then 24. Now it is
+          {{ form.phone.value.length }}.
+        </p>
+      </div> -->
+    </div>
+    <div class="field">
+      <MyInput
+        class="input"
+        name="fax"
+        placeholder="Fax"
+        v-model="form.fax.value"
+      />
+      <!-- <div v-if="form.fax.value.length !== 0">
+        <p v-if="form.fax.errors.maxLength" class="error">
+          Fax length can't be more then 24. Now it is
+          {{ form.fax.value.length }}.
         </p>
       </div> -->
     </div>
@@ -119,7 +157,6 @@
 </template>
 
 <script setup lang="ts">
-import Multiselect from 'vue-multiselect';
 import MyButton from '@/components/common/MyButton.vue';
 import MyInput from '@/components/common/MyInput.vue';
 import { useValidators } from '@/use/validators';
@@ -127,39 +164,21 @@ import { useEventListener } from '@/use/eventListener';
 import { useForm } from '@/use/form';
 defineProps<{
   loading: boolean;
-  suppliers: {
-    id: number;
-    companyName: string;
-    contactName: string | null;
-    contactTitle: string | null;
-    address: string | null;
-    city: string | null;
-    region: string | null;
-    postalCode: string | null;
-    country: string | null;
-    phone: string | null;
-    fax: string | null;
-    homePage: string | null;
-  }[];
-  categories: {
-    id: number;
-    name: string;
-    description: string | null;
-  }[];
 }>();
 const emit = defineEmits<{
   (
     e: 'create',
     payload: {
-      name: string;
-      supplierId: number;
-      categoryId: number;
-      quantityPerUnit: string;
-      unitPrice: number;
-      unitsInStock: number;
-      unitsOnOrder: number;
-      reorderLevel: number;
-      discontinued: boolean;
+      companyName: string;
+      contactName: string | null;
+      contactTitle: string | null;
+      address: string | null;
+      city: string | null;
+      region: string | null;
+      postalCode: string | null;
+      country: string | null;
+      phone: string | null;
+      fax: string | null;
     }
   ): void;
 }>();
@@ -170,7 +189,7 @@ useEventListener(window, 'keyup', (event) => {
 });
 const { required, minLength, optional, maxLength } = useValidators();
 const form = useForm({
-  name: {
+  companyName: {
     value: '',
     validators: {
       required,
@@ -178,71 +197,76 @@ const form = useForm({
       maxLength: maxLength(40),
     },
   },
-  supplier: {
-    value: null,
-    validators: {
-      optional,
-    },
-  },
-  category: {
-    value: null,
-    validators: {
-      optional,
-    },
-  },
-  quantityPerUnit: {
-    value: '',
-    validators: {
-      optional,
-      maxLength: maxLength(20),
-    },
-  },
-  unitPrice: {
+  contactName: {
     value: '',
     validators: {
       optional,
     },
   },
-  unitsInStock: {
+  contactTitle: {
     value: '',
     validators: {
       optional,
     },
   },
-  unitsOnOrder: {
+  address: {
     value: '',
     validators: {
       optional,
     },
   },
-  reorderLevel: {
+  city: {
     value: '',
     validators: {
       optional,
     },
   },
-  discontinued: {
+  region: {
     value: '',
-    validators: {},
+    validators: {
+      optional,
+    },
+  },
+  postalCode: {
+    value: '',
+    validators: {
+      optional,
+    },
+  },
+  country: {
+    value: '',
+    validators: {
+      optional,
+    },
+  },
+  phone: {
+    value: '',
+    validators: {
+      optional,
+    },
+  },
+  fax: {
+    value: '',
+    validators: {
+      optional,
+    },
   },
 });
 const create = () => {
   emit('create', {
-    name: form.name.value,
-    supplierId: form.supplier.value ? form.supplier.value.id : null,
-    categoryId: form.category.value ? form.category.value.id : null,
-    quantityPerUnit:
-      form.quantityPerUnit.value.length !== 0
-        ? form.quantityPerUnit.value
-        : null,
-    unitPrice: form.unitPrice.value.length !== 0 ? form.unitPrice.value : null,
-    unitsInStock:
-      form.unitsInStock.value.length !== 0 ? form.unitsInStock.value : null,
-    unitsOnOrder:
-      form.unitsOnOrder.value.length !== 0 ? form.unitsOnOrder.value : null,
-    reorderLevel:
-      form.reorderLevel.value.length !== 0 ? form.reorderLevel.value : null,
-    discontinued: form.discontinued.value ? form.discontinued.value : false,
+    companyName: form.companyName.value,
+    contactName:
+      form.contactName.value.length !== 0 ? form.contactName.value : null,
+    contactTitle:
+      form.contactTitle.value.length !== 0 ? form.contactTitle.value : null,
+    address: form.address.value.length !== 0 ? form.address.value : null,
+    city: form.city.value.length !== 0 ? form.city.value : null,
+    region: form.region.value.length !== 0 ? form.region.value : null,
+    postalCode:
+      form.postalCode.value.length !== 0 ? form.postalCode.value : null,
+    country: form.country.value.length !== 0 ? form.country.value : null,
+    phone: form.phone.value.length !== 0 ? form.phone.value : null,
+    fax: form.fax.value.length !== 0 ? form.fax.value : null,
   });
 };
 </script>

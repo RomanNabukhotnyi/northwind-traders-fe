@@ -1,8 +1,21 @@
 <template>
+  <MyDialog v-model:show="createVisible">
+    <CreateCustomer @create="createCustomer" :loading="loading" />
+  </MyDialog>
+  <MyDialog v-model:show="editVisible">
+    <EditCustomer
+      :customer="editingCustomer!"
+      :loading="loading"
+      @update="editCustomer"
+    />
+  </MyDialog>
   <section class="section main-section">
-    <div class="card has-table" v-if="customers.length">
+    <div class="card has-table" v-if="customersByPage.length">
       <header class="card-header">
         <p class="card-header-title">Customers</p>
+        <MyButton v-if="isAdmin" class="createBtn" @click="openCreate">
+          Create
+        </MyButton>
       </header>
       <div class="card-content">
         <table>
@@ -14,10 +27,11 @@
               <th>Title</th>
               <th>City</th>
               <th>Country</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="customer in customers[page]" :key="customer.id">
+            <tr v-for="customer in customersByPage[page]" :key="customer.id">
               <td class="image-cell">
                 <div class="image">
                   <img
@@ -35,18 +49,32 @@
               <td>{{ customer.contactTitle }}</td>
               <td>{{ customer.city }}</td>
               <td>{{ customer.country }}</td>
+              <td class="actions">
+                <MyButton
+                  v-if="isAdmin"
+                  class="editBtn"
+                  @click="openEdit(customer)"
+                  >Edit</MyButton
+                >
+                <MyButton
+                  v-if="isAdmin"
+                  class="deleteBtn"
+                  @click="deleteCustomer(customer.id)"
+                  >Delete</MyButton
+                >
+              </td>
             </tr>
           </tbody>
         </table>
         <div class="table-pagination">
           <div class="pagination">
             <div class="buttons">
-              <div v-for="num in customers.length" :key="num">
+              <div v-for="num in customersByPage.length" :key="num">
                 <button
                   type="button"
                   class="button"
                   v-if="
-                    (num <= page + 7 || num >= customers.length - 1) &&
+                    (num <= page + 7 || num >= customersByPage.length - 1) &&
                     (num <= 2 || num >= page - 6)
                   "
                   :class="{ active: page === num - 1 }"
@@ -63,7 +91,7 @@
                 </button>
               </div>
             </div>
-            <small>Page {{ page + 1 }} of {{ customers.length }}</small>
+            <small>Page {{ page + 1 }} of {{ customersByPage.length }}</small>
           </div>
         </div>
       </div>
@@ -75,16 +103,45 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import MyButton from '@/components/common/MyButton.vue';
+import MyDialog from '@/components/common/MyDialog.vue';
+import CreateCustomer from '@/components/pages/customers/components/CreateCustomer.vue';
+import EditCustomer from '@/components/pages/customers/components/EditCustomer.vue';
 import { useCustomersStore } from '@/stores/customers';
+import { useUsersStore } from '@/stores/users';
 const customersStore = useCustomersStore();
+const usersStore = useUsersStore();
 const router = useRouter();
-const customers = computed(() => customersStore.customersByPage);
+const customersByPage = computed(() => customersStore.getAllByPage());
+const isAdmin = computed(() => usersStore.isAdmin);
+const createVisible = ref(false);
+const editVisible = ref(false);
+const editingCustomer = ref(null);
+const loading = computed(() => customersStore.loading);
+const openCreate = () => {
+  createVisible.value = true;
+};
+const createCustomer = (customer: any) => {
+  customersStore.create(customer);
+  createVisible.value = false;
+};
+const openEdit = (customer: any) => {
+  editingCustomer.value = customer;
+  editVisible.value = true;
+};
+const editCustomer = (customer: any) => {
+  customersStore.update(customer);
+  editVisible.value = false;
+};
 const openCustomer = (id: string) => {
   router.push(`/customers/${id}`);
 };
 const page = ref(0);
 const selectPage = (num: number) => {
   page.value = num;
+};
+const deleteCustomer = (id: string) => {
+  customersStore.delete(id);
 };
 const getAvatarUrl = (name: string) => {
   const initials = name.split(' ');
@@ -95,6 +152,25 @@ const getAvatarUrl = (name: string) => {
 </script>
 
 <style scoped>
+.actions {
+  display: flex;
+  justify-content: right;
+}
+.deleteBtn {
+  background-color: #ff4747;
+  width: 75px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+.editBtn {
+  background-color: #ffc038;
+  width: 75px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.createBtn {
+  width: 10%;
+}
 .main-section {
   padding: 1.5rem;
 }

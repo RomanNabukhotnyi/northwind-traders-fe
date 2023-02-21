@@ -1,8 +1,26 @@
 <template>
+  <MyDialog v-model:show="createVisible">
+    <CreateEmployee
+      @create="createEmployee"
+      :loading="loading"
+      :employees="employees"
+    />
+  </MyDialog>
+  <MyDialog v-model:show="editVisible">
+    <EditEmployee
+      :employee="editingEmployee!"
+      :loading="loading"
+      :employees="employees"
+      @update="editEmployee"
+    />
+  </MyDialog>
   <section class="section main-section">
     <div class="card has-table" v-if="employees.length">
       <header class="card-header">
         <p class="card-header-title">Employees</p>
+        <MyButton v-if="isAdmin" class="createBtn" @click="openCreate">
+          Create
+        </MyButton>
       </header>
       <div class="card-content">
         <table>
@@ -14,10 +32,11 @@
               <th>City</th>
               <th>Phone</th>
               <th>Country</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="employee in employees[page]" :key="employee.id">
+            <tr v-for="employee in employeesByPage[page]" :key="employee.id">
               <td class="image-cell">
                 <div class="image">
                   <img
@@ -35,18 +54,32 @@
               <td>{{ employee.city }}</td>
               <td>{{ employee.homePhone }}</td>
               <td>{{ employee.country }}</td>
+              <td class="actions">
+                <MyButton
+                  v-if="isAdmin"
+                  class="editBtn"
+                  @click="openEdit(employee)"
+                  >Edit</MyButton
+                >
+                <MyButton
+                  v-if="isAdmin"
+                  class="deleteBtn"
+                  @click="deleteEmployee(employee.id)"
+                  >Delete</MyButton
+                >
+              </td>
             </tr>
           </tbody>
         </table>
         <div class="table-pagination">
           <div class="pagination">
             <div class="buttons">
-              <div v-for="num in employees.length" :key="num">
+              <div v-for="num in employeesByPage.length" :key="num">
                 <button
                   type="button"
                   class="button"
                   v-if="
-                    (num <= page + 7 || num >= employees.length - 1) &&
+                    (num <= page + 7 || num >= employeesByPage.length - 1) &&
                     (num <= 2 || num >= page - 6)
                   "
                   :class="{ active: page === num - 1 }"
@@ -63,7 +96,7 @@
                 </button>
               </div>
             </div>
-            <small>Page {{ page + 1 }} of {{ employees.length }}</small>
+            <small>Page {{ page + 1 }} of {{ employeesByPage.length }}</small>
           </div>
         </div>
       </div>
@@ -75,14 +108,44 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import MyDialog from '@/components/common/MyDialog.vue';
+import CreateEmployee from '@/components/pages/employees/components/CreateEmployee.vue';
+import EditEmployee from '@/components/pages/employees/components/EditEmployee.vue';
 import { useEmployeesStore } from '@/stores/employees';
+import MyButton from '@/components/common/MyButton.vue';
+import { useUsersStore } from '@/stores/users';
 const employeesStore = useEmployeesStore();
 const router = useRouter();
-const employees = computed(() => employeesStore.employeesByPage);
+const usersStore = useUsersStore();
+const isAdmin = computed(() => usersStore.isAdmin);
+const employees = computed(() => employeesStore.employees);
+const employeesByPage = computed(() => employeesStore.getAllByPage());
 const getAvatarUrl = (firstName: string, lastName: string) => {
   return `https://avatars.dicebear.com/v2/initials/${firstName}-${lastName}.svg`;
 };
 const page = ref(0);
+const createVisible = ref(false);
+const editVisible = ref(false);
+const editingEmployee = ref(null);
+const loading = computed(() => employeesStore.loading);
+const createEmployee = (employee: any) => {
+  employeesStore.create(employee);
+  createVisible.value = false;
+};
+const editEmployee = (employee: any) => {
+  employeesStore.update(employee);
+  editVisible.value = false;
+};
+const openCreate = () => {
+  createVisible.value = true;
+};
+const openEdit = (employee: any) => {
+  editingEmployee.value = employee;
+  editVisible.value = true;
+};
+const deleteEmployee = (id: number) => {
+  employeesStore.delete(id);
+};
 const selectPage = (num: number) => {
   page.value = num;
 };
@@ -92,6 +155,25 @@ const openEmployee = (id: number) => {
 </script>
 
 <style scoped>
+.actions {
+  display: flex;
+  justify-content: right;
+}
+.deleteBtn {
+  background-color: #ff4747;
+  width: 75px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+.editBtn {
+  background-color: #ffc038;
+  width: 75px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.createBtn {
+  width: 10%;
+}
 .main-section {
   padding: 1.5rem;
 }

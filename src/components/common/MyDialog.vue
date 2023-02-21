@@ -50,7 +50,7 @@ useEventListener(window, 'keyup', (event) => {
   right: 0;
   bottom: 0;
   left: 0;
-  min-width: 250px;
+  min-width: 300px;
   margin: auto;
   width: fit-content;
   height: fit-content;

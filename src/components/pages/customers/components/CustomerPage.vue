@@ -1,4 +1,11 @@
 <template>
+  <MyDialog v-model:show="editVisible">
+    <EditCustomer
+      :customer="customer!"
+      :loading="loading"
+      @update="editCustomer"
+    />
+  </MyDialog>
   <section class="section main-section">
     <div class="card mb-6">
       <header class="card-header">
@@ -6,6 +13,12 @@
           <span class="icon material-icons">ballot</span
           ><span class="ml-2">Customer information</span>
         </p>
+        <MyButton v-if="isAdmin" class="editBtn" @click="openEdit"
+          >Edit</MyButton
+        >
+        <MyButton v-if="isAdmin" class="deleteBtn" @click="deleteCustomer"
+          >Delete</MyButton
+        >
       </header>
       <div class="card-content">
         <div class="grid grid-cols-2 gap-4">
@@ -116,19 +129,50 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCustomersStore } from '@/stores/customers';
+import { useUsersStore } from '@/stores/users';
+import MyDialog from '@/components/common/MyDialog.vue';
+import MyButton from '@/components/common/MyButton.vue';
+import EditCustomer from '@/components/pages/customers/components/EditCustomer.vue';
 const customersStore = useCustomersStore();
+const usersStore = useUsersStore();
+const editVisible = ref(false);
+const isAdmin = computed(() => usersStore.isAdmin);
+const loading = computed(() => customersStore.loading);
+const openEdit = () => {
+  editVisible.value = true;
+};
+const editCustomer = (customer: any) => {
+  customersStore.update(customer);
+  editVisible.value = false;
+};
 const router = useRouter();
 const customer = computed(() =>
   customersStore.customers.find(
     (p) => p.id === router.currentRoute.value.params.id
   )
 );
+const deleteCustomer = () => {
+  customersStore.delete(customer.value!.id);
+  router.push('/customers');
+};
 </script>
 
 <style scoped>
+.editBtn {
+  background-color: #ffc038;
+  width: 75px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.deleteBtn {
+  background-color: #ff4747;
+  width: 75px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
 .main-section {
   padding: 1.5rem;
 }
