@@ -11,6 +11,7 @@ import Employee from '../components/pages/employees/components/EmployeePage.vue'
 import Customers from '../components/pages/customers/CustomersPage.vue';
 import Customer from '../components/pages/customers/components/CustomerPage.vue';
 import Search from '../components/pages/search/SearchPage.vue';
+import Statistics from '../components/pages/statistics/StatisticsPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -75,6 +76,11 @@ const router = createRouter({
           path: 'search',
           name: 'search',
           component: Search,
+        },
+        {
+          path: '/statistics',
+          name: 'statistics',
+          component: Statistics,
         },
       ],
     },

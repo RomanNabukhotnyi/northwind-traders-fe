@@ -71,6 +71,16 @@
             ><span class="menu-item-label">Search</span></RouterLink
           >
         </li>
+        <li>
+          <RouterLink
+            :class="{
+              active: router.currentRoute.value.path === '/statistics',
+            }"
+            to="/statistics"
+            ><span class="icon material-icons">analytics</span
+            ><span class="menu-item-label">Statistics</span></RouterLink
+          >
+        </li>
       </ul>
     </div>
     <MyButton v-if="!isAdmin" class="adminBtn" @click="showLoginForm"

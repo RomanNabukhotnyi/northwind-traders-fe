@@ -17,12 +17,14 @@ interface Product {
 interface State {
   loading: boolean;
   products: Product[];
+  totalProductsSold: { name: string; totalQuantity: number }[];
 }
 
 export const useProductsStore = defineStore('products', {
   state: (): State => ({
     products: [],
     loading: false,
+    totalProductsSold: [],
   }),
   actions: {
     async create(product: {
@@ -86,6 +88,8 @@ export const useProductsStore = defineStore('products', {
       const response = await fetch('http://localhost:4000/products');
       const products = (await response.json()).data as Product[];
       this.products = products;
+      const res = await fetch('http://localhost:4000/products/statistic');
+      this.totalProductsSold = (await res.json()).data;
     },
   },
 });
